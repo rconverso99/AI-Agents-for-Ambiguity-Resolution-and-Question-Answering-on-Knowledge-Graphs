@@ -10,8 +10,9 @@ The system represents both the **semantic** and **syntactic** structure of user 
 
 **Example Interaction:**
 
-**User:** Can I take paracetamol after meals?
-**System:** Paracetamol can be taken after meals.
+**User:** Posso prendere la tachipirina dopo i pasti?
+
+**System:** La tachipirina può essere presa dopo i pasti.
 
 Generated graph:
 
@@ -36,10 +37,10 @@ Graph structure example:
 The system can detect ambiguous sentences, generate all possible interpretations, and add them to the conversation graph. If multiple interpretations exist, the chatbot asks for clarification.
 
 **Example:**
-*"Anna watches Francesco while crossing the street"*
+*"Anna guarda Francesco mentre attraversa la strada"*
 
-* Interpretation 1: Anna is crossing the street.
-* Interpretation 2: Francesco is crossing the street.
+* Interpretation 1: Anna sta attraversando la strada.
+* Interpretation 2: Francesco sta attraversando la strada.
 
 Graphs for each interpretation:
 
@@ -47,7 +48,7 @@ Graphs for each interpretation:
 <img width="1416" height="877" alt="Francesco crosses street" src="https://github.com/user-attachments/assets/d2405f64-115c-4732-aa98-a8b6eb23f513" />
 
 **Clarification Question:**
-*"Who is crossing the street, Anna or Francesco?"*
+*"Non ho capito, chi sta attraversando la strada Anna o Francesco?"*
 
 <img width="1416" height="877" alt="Clarification question" src="https://github.com/user-attachments/assets/d8c23f58-9b56-4ead-8695-473faff0eb54" />
 
@@ -62,7 +63,7 @@ LangGraph structure for ambiguity detection:
 Once the user provides clarification, the system updates the graph by **removing incorrect interpretations**.
 
 **Example:**
-*"Marco watches Luca while crossing the street"*
+*"Marco guarda Luca mentre attraversa la strada"*
 
 Before clarification:
 
