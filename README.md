@@ -1,87 +1,95 @@
+# AI Agents for Ambiguity Resolution and Question Answering on Knowledge Graphs
 
+This project implements AI agents capable of performing context-aware question answering and disambiguation over knowledge graphs using **LangGraph** and Neo4j. The system represents conversation states, manages ambiguities, and updates the knowledge graph based on user feedback.
 
-Rappresentazione Stato della Conversazione
+---
 
-Per quanto riguarda la rappresentazione della conversazione tra utente e chatbot, inserirò qui sotto tutti gli aggiornamenti.
-Per ora ho integrato tutto il sistema della rappresentazione semantica e sintattica delle frasi che abbiamo realizzato io e ANTONIO DI GERONIMO al task di "Rappresentazione Stato della Conversazione", tramite **LangGraph**.
+## Conversation State Representation
 
-Di seguito vi condivido un esempio di interazione semplice (domanda -> risposta).
+The system represents both the **semantic** and **syntactic** structure of user inputs within LangGraph, allowing the chatbot to track conversation states precisely.
 
-**User:** Posso prendere la tachipirina dopo i pasti?
+**Example Interaction:**
 
-**System:** La tachipirina può essere assunta dopo i pasti.
+**User:** Can I take paracetamol after meals?
+**System:** Paracetamol can be taken after meals.
 
-Grafo generato:
+Generated graph:
 
-<img width="1301" height="846" alt="image" src="https://github.com/user-attachments/assets/3958dfb6-31ca-4f62-b8e5-6ef4e1bfb101" />
+<img width="1301" height="846" alt="Conversation graph example" src="https://github.com/user-attachments/assets/3958dfb6-31ca-4f62-b8e5-6ef4e1bfb101" />
 
+The system currently generates responses directly from the LLM for testing purposes, with the database integration (from Antonio Di Geronimo) planned for the next stage.
 
-Solo per fare testing, mi sono limitato a far generare all'LLM la risposta alla domanda, quindi escludendo per ora completamente la parte di estrazione delle informazioni dal database che mi fornirà ANTONIO DI GERONIMO.
+---
 
-Inoltre nel flusso di esecuzione su LangGraph ho aggiunto sia il caso in cui il chatbot dovrà solo rispondere alla domanda e sia il caso in cui dovrà aggiornare la conoscenza contenuta nel DB.
+## LangGraph Structure
 
-Vi allego la struttura realizzata in LangGraph:
+LangGraph handles both simple Q&A and updates to the knowledge graph.
 
-<img width="536" height="743" alt="image" src="https://github.com/user-attachments/assets/aae0e715-8e39-4879-8a5f-7e5f0b3eeb56" />
+Graph structure example:
 
+<img width="536" height="743" alt="LangGraph structure" src="https://github.com/user-attachments/assets/aae0e715-8e39-4879-8a5f-7e5f0b3eeb56" />
 
-Nei prossimi giorni mi occuperò di:
+---
 
-1.  Gestire il caso di domande o frasi ambigue, dando la possibilità al chatbot di interrompere il flusso e di chiedere all'utente delucidazioni. (prepariamoci ad una struttura di LangGraph ancora più complessa ![😡](https://statics.teams.cdn.office.net/evergreen-assets/personal-expressions/v2/assets/emoticons/angryface/default/30_f.png?v=v21))
-2.  Effettuare qualche test con un database reale, quindi facendo rispondere l'LLM con un supporto di qualche corpus di testo, in attesa che Antonio mi fornisce un suo DB per il testing
-3.  Aggiungere timestamp della conversazione
+## Ambiguity Detection
 
+The system can detect ambiguous sentences, generate all possible interpretations, and add them to the conversation graph. If multiple interpretations exist, the chatbot asks for clarification.
 
+**Example:**
+*"Anna watches Francesco while crossing the street"*
 
-**Aggiornamento: Gestione domande o frasi ambigue**
-Mediante l'aggiunta di ulteriori nodi in LangGraph, adesso il sistema è in grado di riconoscere se gli viene fornita una frase ambigua.
-Ricevuta la frase genera tutte le possibili interpretazioni e le aggiunge al grafo dello stato della conversazione.
-Una volta aggiunte rileva che ci sono più interpretazioni della frase e genera una *domanda di chiarimento* da fornire all'utente.
-Di seguito vi condivido la struttura LangGraph attuale (più passano i giorni e più si complica :P )
-<img width="784" height="622" alt="image" src="https://github.com/user-attachments/assets/00e12489-0ab1-49b6-a708-536b03036a0d" />
+* Interpretation 1: Anna is crossing the street.
+* Interpretation 2: Francesco is crossing the street.
 
+Graphs for each interpretation:
 
-Esempio:
-*"Anna guarda Francesco mentre attraversa la strada"*
- 
-Anna guarda Franscesco mentre ANNA attraversa la strada:
-<img width="1416" height="877" alt="image" src="https://github.com/user-attachments/assets/40a4155e-c2bc-4ac7-a0f9-d8e7ac190942" />
+<img width="1416" height="877" alt="Anna crosses street" src="https://github.com/user-attachments/assets/40a4155e-c2bc-4ac7-a0f9-d8e7ac190942" />  
+<img width="1416" height="877" alt="Francesco crosses street" src="https://github.com/user-attachments/assets/d2405f64-115c-4732-aa98-a8b6eb23f513" />
 
-Anna guarda Francesco mentre FRANCESCO attraversa la strada: 
-<img width="1416" height="877" alt="image" src="https://github.com/user-attachments/assets/d2405f64-115c-4732-aa98-a8b6eb23f513" />
+**Clarification Question:**
+*"Who is crossing the street, Anna or Francesco?"*
 
-**Domanda di chiarimento:** *Non mi è chiaro, chi sta attraversando la strada, Anna o Francesco?*
-<img width="1416" height="877" alt="image" src="https://github.com/user-attachments/assets/d8c23f58-9b56-4ead-8695-473faff0eb54" />
+<img width="1416" height="877" alt="Clarification question" src="https://github.com/user-attachments/assets/d8c23f58-9b56-4ead-8695-473faff0eb54" />
 
+LangGraph structure for ambiguity detection:
 
-**Aggiornamento: Gestione ambiguità ed eliminazione interpretazioni errate dal grafo**
-Nell'ultimo aggiornamento eravamo rimasti alla generazione delle interpretazioni da parte del sistema con il relativo aggiornamento del grafo.
-In questa settimana ho lavorato riguardo il tentativo di disambiguare la frase o domanda fornita dall'utente, vi mostro un esempio con la frase ambigua vista settimana scorsa.
- 
-*Frase: Marco guarda Luca mentre attraversa la strada*
-Nell'ultimo aggiornamento eravamo rimasti ad una struttura del genere:
-<img width="1350" height="648" alt="image" src="https://github.com/user-attachments/assets/0b250bc4-ccae-4cb8-869d-abec4d14a142" />
+<img width="784" height="622" alt="LangGraph ambiguity structure" src="https://github.com/user-attachments/assets/00e12489-0ab1-49b6-a708-536b03036a0d" />
 
-In questa struttura possiamo notare come da una delle due interpretazioni otteniamo che **Luca-[ACTS]-attraversare**, mentre dall'altra interpretazione otteniamo che è Marco ad attraversare la strada.
- 
-Adesso supponiamo che, dopo la domanda di chiarimento del sistema (Non mi è chiaro, Marco sta attraversando la strada o Luca sta attraversando la strada?) l'utente risponda con "Marco".
- 
-Di conseguenza otteniamo questa nuova struttura modificata:
-<img width="1199" height="669" alt="image" src="https://github.com/user-attachments/assets/c2d01fab-11b4-4860-a50f-ea7f1696511e" />
+---
 
- 
-Possiamo notare come la relazione **Luca-[ACTS]->attraversare** sia del tutto sparita dal grafo, e anche l'interpretazione da cui avevamo dedotto questo è stata completamente eliminata dal grafo.
+## Disambiguation and Graph Update
 
-La struttura in LangGraph ha subito una piccola modifica.
-Abbiamo deciso di separare in due grafi differenti la gestione del dialogo e l'aggiornamento del grafo in Neo4j.
-La gestione del dialogo è la seguente:
-<img width="784" height="750" alt="image" src="https://github.com/user-attachments/assets/3ec389cb-c02c-4a68-a0ac-fdb7b4efafe1" />
+Once the user provides clarification, the system updates the graph by **removing incorrect interpretations**.
 
+**Example:**
+*"Marco watches Luca while crossing the street"*
 
-L'aggiornamento del grafo in Neo4j invece è questa:
+Before clarification:
 
-<img width="337" height="531" alt="image" src="https://github.com/user-attachments/assets/612033e5-fcb4-40db-ac29-25165a75434e" />
+<img width="1350" height="648" alt="Ambiguous graph" src="https://github.com/user-attachments/assets/0b250bc4-ccae-4cb8-869d-abec4d14a142" />
 
+User clarifies: *"Marco"*
 
+After update:
 
+<img width="1199" height="669" alt="Disambiguated graph" src="https://github.com/user-attachments/assets/c2d01fab-11b4-4860-a50f-ea7f1696511e" />
 
+The graph now reflects only the correct interpretation, and the incorrect branch is removed.
+
+---
+
+## Dialogue Management vs Knowledge Graph Update
+
+The system separates **dialogue management** from **Neo4j knowledge graph updates**:
+
+**Dialogue Management Graph:**
+
+<img width="784" height="750" alt="Dialogue management graph" src="https://github.com/user-attachments/assets/3ec389cb-c02c-4a68-a0ac-fdb7b4efafe1" />
+
+**Neo4j Graph Update:**
+
+<img width="337" height="531" alt="Neo4j graph update" src="https://github.com/user-attachments/assets/612033e5-fcb4-40db-ac29-25165a75434e" />
+
+This separation allows the system to maintain real-time conversation state while updating the persistent knowledge graph safely.
+
+---
